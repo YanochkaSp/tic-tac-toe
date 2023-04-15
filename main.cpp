@@ -1,17 +1,34 @@
 #include <SFML/Graphics.hpp>
+#include <time.h>
 
 using namespace sf;
 
 class Stav
 {
     public:
-        Sprite sprite[9];                                                                                       //поскольку всего 9 ячеек
-        bool tik[9];                                                                                            //для того, чтобы спрайты в ячейках были (не)видны
+        Sprite sprite[9];                                                                           //устанавливает позиции для каждого спрайта в массиве sprite в зависимости от их индексов (от 0 до 8)                                       
+        bool tik[9];                                                                                //чтобы спрайты не были видны в начале игры
 
+        Stav(Texture& image) {                                                                      //ссылка на текстуру, которая передается в класс при его создании
+		for (int i = 0; i < 9; i++) {
+			sprite[i].setTexture(image);
+			tik[i] = false;
+		}
+		for (int i = 0; i < 3; i++)
+			for (int j = 0; j < 3; j++)
+				sprite[i * 3 + j].setPosition(200 * j, 200 * i);
+	    }
+
+        void update(int& vid) {                                                                     //обновляет текстурный прямоугольник каждого из девяти спрайтов в объекте Stav
+            for (int i = 0; i < 9; i++)
+                sprite[i].setTextureRect(IntRect(200 * (vid - 1), 0, 200, 200));
+        }                                                                                     
 };
 
 int main()
 {
+    srand(time(0));                                                                                             //для установки начального значения для генератора случайных чисел
+
     RenderWindow window(VideoMode(600, 600), "tic-tac-toe");
 
     Texture net;                                                                                                //сетка
@@ -29,6 +46,8 @@ int main()
 
     int Choice = 0;                                                                                             //для того, чтобы выбирать крестик или нолик
 
+    Stav player(c), bot(c);
+
     while (window.isOpen())
     {
 
@@ -44,13 +63,23 @@ int main()
             {
                 if (event.key.code == Mouse::Left)
                 {
-                    for (int i = 0; i < 2; i++)
+                    if (Choice == 0)                                                                     //если элемент не выбран, будем выбирать
                     {
-                        if (choice[i].getGlobalBounds().contains(pos.x, pos.y))
+                        for (int i = 0; i < 2; i++)
                         {
-                            Choice = i + 1;
+                            if (choice[i].getGlobalBounds().contains(pos.x, pos.y))
+                                Choice = i + 1;
                         }
                     }
+                    else
+                    {
+                        for (int i = 0; i < 9; i++)
+                        {
+                            if (player.sprite[i].getGlobalBounds().contains(pos.x, pos.y))              //если нажали на какую-то ячейку
+                                player.tik[i] = true;
+                        }
+                    }
+                    
                 }
             }
         }
@@ -63,7 +92,9 @@ int main()
                 choice[i].setTextureRect(IntRect(200*i, 0, 200, 200));
         }
 
+        player.update(Choice);
         window.clear(Color::White);
+
 
         if (Choice == 0)                                                                                            //если выбор спрайта не сделан
         {
@@ -73,6 +104,11 @@ int main()
         else
         {
             window.draw(fon);                                                                                       //на экран выводится сетка для игры
+            for (int i = 0; i < 9; i++)
+            {
+                if (player.tik[i])
+                    window.draw(player.sprite[i]);
+            }
         }
         window.display();
     }   
