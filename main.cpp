@@ -10,14 +10,14 @@ class Stav
         bool tik[9];                                                                                //чтобы спрайты не были видны в начале игры
 
         Stav(Texture& image) {                                                                      //ссылка на текстуру, которая передается в класс при его создании
-		for (int i = 0; i < 9; i++) {
-			sprite[i].setTexture(image);
-			tik[i] = false;
-		}
-		for (int i = 0; i < 3; i++)
-			for (int j = 0; j < 3; j++)
-				sprite[i * 3 + j].setPosition(200 * j, 200 * i);
-	    }
+            for (int i = 0; i < 9; i++) {
+                sprite[i].setTexture(image);
+                tik[i] = false;
+            }
+            for (int i = 0; i < 3; i++)
+                for (int j = 0; j < 3; j++)
+                    sprite[i * 3 + j].setPosition(200 * j, 200 * i);
+        }
 
         void update(int& vid) {                                                                     //обновляет текстурный прямоугольник каждого из девяти спрайтов в объекте Stav
             for (int i = 0; i < 9; i++)
@@ -76,10 +76,13 @@ int main()
                         for (int i = 0; i < 9; i++)
                         {
                             if (player.sprite[i].getGlobalBounds().contains(pos.x, pos.y))              //если нажали на какую-то ячейку
-                                player.tik[i] = true;
+                            {
+                                player.tik[i] = true;                                                   //игрок сделал ход 
+                                int botstav = rand() % 9;                                               //бот делает случайный ход в ячейку от 0 до 8
+                                bot.tik[botstav] = true;                                                //бот сделал ход 
+                            }
                         }
-                    }
-                    
+                    }   
                 }
             }
         }
@@ -93,6 +96,13 @@ int main()
         }
 
         player.update(Choice);
+
+        int ChoiceforBot = Choice + 1;                                                                      //чтобы игрок и бот не смогли выбрать одинаковый спрайт (чтобы бот играл крестиком, а игрок -- ноликом или наоборот)
+        if (ChoiceforBot == 3)
+            ChoiceforBot = 1;
+
+        bot.update(ChoiceforBot);
+
         window.clear(Color::White);
 
 
@@ -108,6 +118,9 @@ int main()
             {
                 if (player.tik[i])
                     window.draw(player.sprite[i]);
+
+                if (bot.tik[i])
+                    window.draw(bot.sprite[i]);
             }
         }
         window.display();
