@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <time.h>
+#include <algorithm>
 
 using namespace sf;
 
@@ -8,20 +9,33 @@ class Stav
     public:
         Sprite sprite[9];                                                                           //устанавливает позиции для каждого спрайта в массиве sprite в зависимости от их индексов (от 0 до 8)                                       
         bool tik[9];                                                                                //чтобы спрайты не были видны в начале игры
-
-        Stav(Texture& image) 
-        {                                                                      //ссылка на текстуру, которая передается в класс при его создании
+  
+        Stav() {};
+        Stav(Texture& image)                                                                      //ссылка на текстуру, которая передается в класс при его создании
+        { 
+            std::fill(tik, tik+9, false);                                                         //заполняет массив tik значением false
             for (int i = 0; i < 9; i++)
             {
                 sprite[i].setTexture(image);
-                tik[i] = false;
+                //tik[i] = false;
             }
             for (int i = 0; i < 3; i++)
                 for (int j = 0; j < 3; j++)
                     sprite[i * 3 + j].setPosition(200 * j, 200 * i);
         }
 
-        void update(int& vid) {                                                                     //обновляет текстурный прямоугольник каждого из девяти спрайтов в объекте Stav
+        void setTexture(const Texture& image)                                                       //установика текстуры для всех спрайтов на игровом поле одновременно
+        {
+            for (int i = 0; i < 9; i++)
+                sprite[i].setTexture(image);
+        }
+
+        void update(int& vid)                                                                     //обновляет текстурный прямоугольник каждого из девяти спрайтов в объекте Stav
+        {
+            // if (c.Choice == 0)
+            // {
+            //     vid -= 1;
+            // }
             for (int i = 0; i < 9; i++)
                 sprite[i].setTextureRect(IntRect(200 * (vid - 1), 0, 200, 200));
         }                                                                                     
@@ -30,26 +44,27 @@ class Stav
 class Game
 {
     public:
-        int Choice;
+        int Choice;                                                                                                 ////для того, чтобы выбирать крестик или нолик
         Texture net;                                                                                                //сетка
         Texture c;                                                                                                  //для выбора крестика или нолика
         Stav player, bot;
         Sprite choice[2];
         Sprite fon;
 
-        Game():player(c), bot(c)
+        Game(): Choice(0)
         {
-            net.loadFromFile("/Users/yanasp/tic-tac-toe/paint/fon.png");
-            fon.setTexture(net);
+            net.loadFromFile("fon.png");
+            c.loadFromFile("crnol.png"); 
+            player.setTexture(c);
+            bot.setTexture(c);    
 
-            c.loadFromFile("/Users/yanasp/tic-tac-toe/paint/crnol.png");
+            fon.setTexture(net);
             for (int i = 0; i < 2; i++)
             {
                 choice[i].setTexture(c);                                                                                //загрузка текстуры для получения спрайта
                 choice[i].setPosition(50 + 300 * i, 180);                                                               //позиция спрайта(крестика/нолика)
-            }
+            } 
         }
-
 };
 
 
@@ -61,26 +76,8 @@ int main()
     Game game;
 
 
-    // Texture net;                                                                                                //сетка
-    // net.loadFromFile("/Users/yanasp/tic-tac-toe/paint/fon.png");
-    // Sprite fon(net);
-
-    // Texture c;                                                                                                  //для выбора крестика или нолика
-    // c.loadFromFile("/Users/yanasp/tic-tac-toe/paint/crnol.png");
-    // Sprite choice[2];
-    // for (int i = 0; i < 2; i++)
-    // {
-    //     choice[i].setTexture(c);                                                                                //загрузка текстуры для получения спрайта
-    //     choice[i].setPosition(50 + 300 * i, 180);                                                               //позиция спрайта(крестика/нолика)
-    // }
-
-    // int Choice = 0;                                                                                             //для того, чтобы выбирать крестик или нолик
-
-    // Stav player(c), bot(c);
-
     while (window.isOpen())
     {
-
         Vector2i pos = Mouse::getPosition(window);                                                              //координаты курсора
         
         Event event;
@@ -90,33 +87,41 @@ int main()
                 window.close();
 
             if (event.type == Event::MouseButtonPressed)                                                        //сохраняет выбор (1-крестика/2-нолика) при нажатии в переменную Choice
-            {
-                if (event.key.code == Mouse::Left)
-                {
-                    if (game.Choice == 0)                                                                     //если элемент не выбран, будем выбирать
-                    {
+                if (event.mouseButton.button == Mouse::Left)
+                    if (game.Choice == 0)                                                                           //если элемент не выбран, будем выбирать
                         for (int i = 0; i < 2; i++)
-                        {
                             if (game.choice[i].getGlobalBounds().contains(pos.x, pos.y))
                                 game.Choice = i + 1;
-                        }
-                    }
                     else
-                    {
                         for (int i = 0; i < 9; i++)
                         {
-                            if (game.player.sprite[i].getGlobalBounds().contains(pos.x, pos.y))              //если нажали на какую-то ячейку
+                            if (game.player.sprite[i].getGlobalBounds().contains(pos.x, pos.y))                 //если нажали на какую-то ячейку
                             {
-                                game.player.tik[i] = true;                                                   //игрок сделал ход 
-                                int botstav = rand() % 9;                                               //бот делает случайный ход в ячейку от 0 до 8
-                                game.bot.tik[botstav] = true;                                                //бот сделал ход 
+                                game.player.tik[i] = true;                                                      //игрок сделал ход 
+                                // int botstav = rand() % 9;                                                       //бот делает случайный ход в ячейку от 0 до 8
+                                // game.bot.tik[botstav] = true;                                                   //бот сделал ход 
                             }
-                        }
-                    }   
-                }
-            }
+                            int botstav = rand() % 9; 
+                            game.bot.tik[botstav] = true;   
+                            if (game.player.tik[botstav] || game.bot.tik[botstav])                              //либо player, либо bot уже сделал ход в ячейку с номером botstav
+                                while (game.bot.tik[botstav] == false)
+                                {
+                                    if (game.player.tik[botstav] == game.bot.tik[botstav])                      //игрок и бот поставили знаки в одну и ту же ячейку, такой ход нам не нужен
+                                    {
+                                        game.bot.tik[botstav] = false;
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        game.bot.tik[botstav] = true;
+                                        break;
+                                    }
+                                }                                
+                        }   
         }
 
+        
+            
         for (int i = 0; i < 2; i++)
         {
             if (game.choice[i].getGlobalBounds().contains(pos.x, pos.y))                                                 //если курсор попал в крестик/нолик
@@ -137,10 +142,8 @@ int main()
 
 
         if (game.Choice == 0)                                                                                            //если выбор спрайта не сделан
-        {
             for (int i = 0; i < 2; i++)
                 window.draw(game.choice[i]);                                                                             //на экран выводятся спрайты для выбора
-        }
         else
         {
             window.draw(game.fon);                                                                                       //на экран выводится сетка для игры
@@ -155,5 +158,4 @@ int main()
         }
         window.display();
     }   
-
 }
