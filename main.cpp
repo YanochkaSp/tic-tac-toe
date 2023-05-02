@@ -10,7 +10,9 @@ class Stav
         Sprite sprite[9];                                                                           //устанавливает позиции для каждого спрайта в массиве sprite в зависимости от их индексов (от 0 до 8)                                       
         bool tik[9];                                                                                //чтобы спрайты не были видны в начале игры
   
-        Stav() {};
+        Stav() {
+            std::fill(tik, tik+9, false); 
+        };
         Stav(Texture& image)                                                                      //ссылка на текстуру, которая передается в класс при его создании
         { 
             std::fill(tik, tik+9, false);                                                         //заполняет массив tik значением false
@@ -82,7 +84,7 @@ int main()
         Event event;
         while (window.pollEvent(event))                                                                         //обработка событий окна
         {
-            printf("%s\n", "mouse is on the window");
+            //printf("%s\n", "mouse is on the window");
             if (event.type == Event::Closed)
             {
                 printf("%s\n", "window is closing");
@@ -94,7 +96,7 @@ int main()
                 printf("%s\n", "button was pressed");    
                 if (event.mouseButton.button == Mouse::Left)
                 {   
-                    
+                    printf("%d %d\n", pos.x, pos.y);
                     if (game.Choice == 0)                                                                           //если элемент не выбран, будем выбирать
                     {
                         printf("%s\n", "no choice made");   
@@ -104,7 +106,8 @@ int main()
                             printf("%s\n", "choice was made"); 
                     }
                     else
-                    {                   
+                    {     
+                        printf("was a click after choice\n");              
                         for (int i = 0; i < 9; i++)
                         {
                             printf("%d %s\n", i, "rectangle" ); 
@@ -115,23 +118,23 @@ int main()
                                 // int botstav = rand() % 9;                                                       //бот делает случайный ход в ячейку от 0 до 8
                                 // game.bot.tik[botstav] = true;                                                   //бот сделал ход 
                             }
-                            printf("...\n" ); 
-                            int botstav = rand() % 9; 
-                            game.bot.tik[botstav] = true;   
-                            if (game.player.tik[botstav] || game.bot.tik[botstav])                              //либо player, либо bot уже сделал ход в ячейку с номером botstav
-                                while (game.bot.tik[botstav] == false)
-                                {
-                                    if (game.player.tik[botstav] == game.bot.tik[botstav])                      //игрок и бот поставили знаки в одну и ту же ячейку, такой ход нам не нужен
-                                    {
-                                        game.bot.tik[botstav] = false;
-                                        continue;
-                                    }
-                                    else
-                                    {
-                                        game.bot.tik[botstav] = true;
-                                        break;
-                                    }
-                                }                                
+                            // printf("...\n" ); 
+                            // int botstav = rand() % 9; 
+                            // game.bot.tik[botstav] = true;   
+                            // if (game.player.tik[botstav] || game.bot.tik[botstav])                              //либо player, либо bot уже сделал ход в ячейку с номером botstav
+                            //     while (game.bot.tik[botstav] == false)
+                            //     {
+                            //         if (game.player.tik[botstav] == game.bot.tik[botstav])                      //игрок и бот поставили знаки в одну и ту же ячейку, такой ход нам не нужен
+                            //         {
+                            //             game.bot.tik[botstav] = false;
+                            //             continue;
+                            //         }
+                            //         else
+                            //         {
+                            //             game.bot.tik[botstav] = true;
+                            //             break;
+                            //         }
+                            //     }                                
                         }   
                     }
                 }
@@ -164,11 +167,11 @@ int main()
             window.draw(game.fon);                                                                                       //на экран выводится сетка для игры
             for (int i = 0; i < 9; i++)
             {
-                if (game.player.tik[i])
-                    window.draw(game.player.sprite[i]);
+                if (game.player.tik[i])                                     //
+                    window.draw(game.player.sprite[i]);                     //
 
-                if (game.bot.tik[i])
-                    window.draw(game.bot.sprite[i]);
+                if (game.bot.tik[i])                                        //  
+                    window.draw(game.bot.sprite[i]);                        //
             }
         }
         window.display();
