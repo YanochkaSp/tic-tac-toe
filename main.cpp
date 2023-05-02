@@ -75,32 +75,47 @@ int main()
     RenderWindow window(VideoMode(600, 600), "tic-tac-toe");
     Game game;
 
-
     while (window.isOpen())
     {
         Vector2i pos = Mouse::getPosition(window);                                                              //координаты курсора
         
         Event event;
-        while (window.pollEvent(event))
+        while (window.pollEvent(event))                                                                         //обработка событий окна
         {
+            printf("%s\n", "mouse is on the window");
             if (event.type == Event::Closed)
+            {
+                printf("%s\n", "window is closing");
                 window.close();
+            }
 
             if (event.type == Event::MouseButtonPressed)                                                        //сохраняет выбор (1-крестика/2-нолика) при нажатии в переменную Choice
+            {
+                printf("%s\n", "button was pressed");    
                 if (event.mouseButton.button == Mouse::Left)
+                {   
+                    
                     if (game.Choice == 0)                                                                           //если элемент не выбран, будем выбирать
+                    {
+                        printf("%s\n", "no choice made");   
                         for (int i = 0; i < 2; i++)
                             if (game.choice[i].getGlobalBounds().contains(pos.x, pos.y))
-                                game.Choice = i + 1;
+                            game.Choice = i + 1;
+                            printf("%s\n", "choice was made"); 
+                    }
                     else
+                    {                   
                         for (int i = 0; i < 9; i++)
                         {
+                            printf("%d %s\n", i, "rectangle" ); 
                             if (game.player.sprite[i].getGlobalBounds().contains(pos.x, pos.y))                 //если нажали на какую-то ячейку
                             {
+                                printf("%s %d %s\n", "player clicked on the", i, "rectangle" ); 
                                 game.player.tik[i] = true;                                                      //игрок сделал ход 
                                 // int botstav = rand() % 9;                                                       //бот делает случайный ход в ячейку от 0 до 8
                                 // game.bot.tik[botstav] = true;                                                   //бот сделал ход 
                             }
+                            printf("...\n" ); 
                             int botstav = rand() % 9; 
                             game.bot.tik[botstav] = true;   
                             if (game.player.tik[botstav] || game.bot.tik[botstav])                              //либо player, либо bot уже сделал ход в ячейку с номером botstav
@@ -118,10 +133,11 @@ int main()
                                     }
                                 }                                
                         }   
+                    }
+                }
+            }            
         }
-
-        
-            
+       
         for (int i = 0; i < 2; i++)
         {
             if (game.choice[i].getGlobalBounds().contains(pos.x, pos.y))                                                 //если курсор попал в крестик/нолик
@@ -139,7 +155,6 @@ int main()
         game.bot.update(ChoiceforBot);
 
         window.clear(Color::White);
-
 
         if (game.Choice == 0)                                                                                            //если выбор спрайта не сделан
             for (int i = 0; i < 2; i++)
