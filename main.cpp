@@ -12,6 +12,9 @@ class Stav
   
         Stav() {
             std::fill(tik, tik+9, false); 
+            for (int i = 0; i < 3; i++)
+                for (int j = 0; j < 3; j++)
+                    sprite[i * 3 + j].setPosition(200 * j, 200 * i);
         };
         Stav(Texture& image)                                                                      //ссылка на текстуру, которая передается в класс при его создании
         { 
@@ -102,35 +105,43 @@ int main()
                         printf("%s\n", "no choice made");   
                         for (int i = 0; i < 2; i++)
                             if (game.choice[i].getGlobalBounds().contains(pos.x, pos.y))
-                            game.Choice = i + 1;
-                            printf("%s\n", "choice was made"); 
+                            {
+                                game.Choice = i + 1;
+                                printf("%s\n", "choice was made"); 
+                            }
                     }
                     else
                     {     
                         printf("was a click after choice\n");              
                         for (int i = 0; i < 9; i++)
                         {
-                            printf("%d %s\n", i, "rectangle" ); 
+                            printf("%d\n", game.player.sprite[i].getTextureRect().left); 
+                            printf("%d\n", game.player.sprite[i].getTextureRect().top); 
+                            printf("%d\n", game.player.sprite[i].getTextureRect().width); 
+                            printf("%d\n", game.player.sprite[i].getTextureRect().height); 
                             if (game.player.sprite[i].getGlobalBounds().contains(pos.x, pos.y))                 //если нажали на какую-то ячейку
                             {
                                 printf("%s %d %s\n", "player clicked on the", i, "rectangle" ); 
                                 game.player.tik[i] = true;                                                      //игрок сделал ход 
-                                // int botstav = rand() % 9;                                                       //бот делает случайный ход в ячейку от 0 до 8
-                                // game.bot.tik[botstav] = true;                                                   //бот сделал ход 
+                                int botstav = rand() % 9;                                                       //бот делает случайный ход в ячейку от 0 до 8
+                                game.bot.tik[botstav] = true;                                                   //бот сделал ход 
                             }
                             // printf("...\n" ); 
                             // int botstav = rand() % 9; 
                             // game.bot.tik[botstav] = true;   
+                            // int botstav = rand() % 9;  
                             // if (game.player.tik[botstav] || game.bot.tik[botstav])                              //либо player, либо bot уже сделал ход в ячейку с номером botstav
                             //     while (game.bot.tik[botstav] == false)
                             //     {
                             //         if (game.player.tik[botstav] == game.bot.tik[botstav])                      //игрок и бот поставили знаки в одну и ту же ячейку, такой ход нам не нужен
                             //         {
+                            //             int botstav = rand() % 9;  
                             //             game.bot.tik[botstav] = false;
                             //             continue;
                             //         }
                             //         else
                             //         {
+                            //             int botstav = rand() % 9;  
                             //             game.bot.tik[botstav] = true;
                             //             break;
                             //         }
