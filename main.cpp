@@ -55,6 +55,7 @@ public:
     Game();
 
     void handleMouseClick(Event &event, Vector2i &pos,RenderWindow &window, int &num_of_full_rect);
+    void Victory(RenderWindow &window, bool &win);
 
     void Run()
     {
@@ -79,8 +80,7 @@ public:
                     printf("%s\n", "window is closing");
                     window.close();
                 }
-                handleMouseClick(event, pos, window, num_of_full_rect);
-                
+                handleMouseClick(event, pos, window, num_of_full_rect);               
             }
 
             for (int i = 0; i < 2; i++)
@@ -91,67 +91,8 @@ public:
                     choice[i].setTextureRect(IntRect(200 * i, 0, 200, 200));
             }
 
-            bool winplay[8][2]; //события, при которых вощникает победа (то есть 3 по горизонтали/вертикали/диагонали всего таких комбинация 8), для игрока и бота (то есть 2)
-            for (int i = 0; i < 8; i++)
-            {
-                if (i < 3)
-                {
-                    winplay[i][0] = player.tik[3 * i] && player.tik[1 + 3 * i] && player.tik[2 + 3 * i]; //являются ли три ячейки в горизонтальной линии i заняты символами игрока
-                    winplay[i][1] = bot.tik[3 * i] && bot.tik[1 + 3 * i] && bot.tik[2 + 3 * i];
-                }
-                else if (i >= 3 && i < 6)
-                {
-                    winplay[i][0] = player.tik[i - 3] && player.tik[i] && player.tik[i + 3]; //вертикальная линия
-                    winplay[i][1] = bot.tik[i - 3] && bot.tik[i] && bot.tik[i + 3];
-                }
-                else if (i >= 6)
-                {
-                    winplay[i][0] = player.tik[2 * (i - 6)] && player.tik[4] && player.tik[8 - 2 * (i - 6)]; //диагональная линия
-                    winplay[i][1] = bot.tik[2 * (i - 6)] && bot.tik[4] && bot.tik[8 - 2 * (i - 6)];
-                }
-
-                for (int j = 0; j < 2; j++)
-                    if (winplay[i][j])                                          //если какое-то из вышеперечисленных условий выполнилось
-                    {
-                        win = true;
-                        if (i < 3)
-                        {
-                            line.setTextureRect(IntRect(0, 0, 600, 10)); //горизонталль
-                            int ly = 95 + 200 * i;
-                            printf("%d\n", ly);
-                            line.setPosition(0, ly);
-                        }
-                        else if (i < 6)
-                        {
-                            line.setTextureRect(IntRect(0, 0, 600, 10)); //вертикаль
-                            line.setRotation(90);
-                            int lx = 105 + 200 * (i - 3);
-                            printf("%d\n", lx);
-                            line.setPosition(lx, 0);
-                        }
-                        else if (i == 6)
-                        {
-                            line.setTextureRect(IntRect(0, 0, 600, 10)); //диагональ
-                            line.setRotation(45);
-                            printf("45\n");
-                        }
-                        else if (i == 7)
-                        {
-                            line.setTextureRect(IntRect(0, 0, 600, 10)); //диагональ
-                            line.setRotation(135);
-                            line.setPosition(600, 0);
-                            printf("135\n");
-                            sf::Vertex line[] =//
-                            {                                           //
-                                sf::Vertex(sf::Vector2f(10, 10)),       //для реализации диагонали без текстуры как на сайте sfml
-                                sf::Vertex(sf::Vector2f(150, 150))      //
-                            };                                          //
-
-                        window.draw(line, 2, sf::Lines);
-                        }
-                    }
-            }
-
+            Victory(window, win);
+            
             player.update(Choice);
 
             int ChoiceforBot = Choice + 1; //чтобы игрок и бот не смогли выбрать одинаковый спрайт (чтобы бот играл крестиком, а игрок -- ноликом или наоборот)
@@ -246,10 +187,6 @@ void Game::handleMouseClick(Event &event, Vector2i &pos, RenderWindow &window, i
     }
 }
 
-
-
-
-
 int BotStav() //функция, отвечающая за поиск свободной ячейки и возвращающая ее номер
 {
     int num_of_empty_rect = 0;
@@ -264,6 +201,71 @@ int BotStav() //функция, отвечающая за поиск свобо�
             IsEmpty = false;
     }
     return num_of_empty_rect;
+}
+
+void Game::Victory(RenderWindow &window, bool &win)
+{
+    bool winplay[8][2]; //события, при которых вощникает победа (то есть 3 по горизонтали/вертикали/диагонали всего таких комбинация 8), для игрока и бота (то есть 2)
+    for (int i = 0; i < 8; i++)
+    {
+        if (i < 3)
+        {
+            winplay[i][0] = player.tik[3 * i] && player.tik[1 + 3 * i] && player.tik[2 + 3 * i]; //являются ли три ячейки в горизонтальной линии i заняты символами игрока
+            winplay[i][1] = bot.tik[3 * i] && bot.tik[1 + 3 * i] && bot.tik[2 + 3 * i];
+        }
+        else if (i >= 3 && i < 6)
+        {
+            winplay[i][0] = player.tik[i - 3] && player.tik[i] && player.tik[i + 3]; //вертикальная линия
+            winplay[i][1] = bot.tik[i - 3] && bot.tik[i] && bot.tik[i + 3];
+        }
+        else if (i >= 6)
+        {
+            winplay[i][0] = player.tik[2 * (i - 6)] && player.tik[4] && player.tik[8 - 2 * (i - 6)]; //диагональная линия
+            winplay[i][1] = bot.tik[2 * (i - 6)] && bot.tik[4] && bot.tik[8 - 2 * (i - 6)];
+        }
+
+        for (int j = 0; j < 2; j++)
+            if (winplay[i][j])                                          //если какое-то из вышеперечисленных условий выполнилось
+            {
+                win = true;
+                if (i < 3)
+                {
+                    line.setTextureRect(IntRect(0, 0, 600, 10)); //горизонталль
+                    int ly = 95 + 200 * i;
+                    printf("%d\n", ly);
+                    line.setPosition(0, ly);
+                }
+                else if (i < 6)
+                {
+                    line.setTextureRect(IntRect(0, 0, 600, 10)); //вертикаль
+                    line.setRotation(90);
+                    int lx = 105 + 200 * (i - 3);
+                    printf("%d\n", lx);
+                    line.setPosition(lx, 0);
+                }
+                else if (i == 6)
+                {
+                    line.setTextureRect(IntRect(0, 0, 600, 10)); //диагональ
+                    line.setRotation(45);
+                    printf("45\n");
+                }
+                else if (i == 7)
+                {
+                    line.setTextureRect(IntRect(0, 0, 600, 10)); //диагональ
+                    line.setRotation(135);
+                    line.setPosition(600, 0);
+                    printf("135\n");
+                    sf::Vertex line[] =//
+                    {                                           //
+                        sf::Vertex(sf::Vector2f(10, 10)),       //для реализации диагонали без текстуры как на сайте sfml
+                        sf::Vertex(sf::Vector2f(150, 150))      //
+                    };                                          //
+
+                window.draw(line, 2, sf::Lines);
+                }
+            }
+    }
+
 }
 
 int main()
