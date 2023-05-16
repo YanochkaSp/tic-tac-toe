@@ -37,7 +37,9 @@ public:
             sprite[i].setTextureRect(IntRect(200 * (vid - 1), 0, 200, 200));
     }
 };
+
 int BotStav();
+
 class Game
 {
 public:
@@ -50,23 +52,9 @@ public:
     Sprite fon;
     Sprite line;
     // bool win = false;
+    Game();
 
-    Game() : Choice(0)
-    {
-        net.loadFromFile("fon.png");
-        c.loadFromFile("crnol.png");
-        l.loadFromFile("line.png");
-        line.setTexture(l);
-        player.setTexture(c);
-        bot.setTexture(c);
-
-        fon.setTexture(net);
-        for (int i = 0; i < 2; i++)
-        {
-            choice[i].setTexture(c);                  //загрузка текстуры для получения спрайта
-            choice[i].setPosition(50 + 300 * i, 180); //позиция спрайта(крестика/нолика)
-        }
-    }
+    void handleMouseClick(Event &event, Vector2i &pos,RenderWindow &window, int &num_of_full_rect);
 
     void Run()
     {
@@ -74,7 +62,7 @@ public:
         srand(time(0)); //для установки начального значения для генератора случайных чисел
 
         RenderWindow window(VideoMode(600, 600), "tic-tac-toe");
-        Game game;
+        //Game game;
         //game set window (что-то такое)
         int num_of_full_rect = 0; //будет считать кол-во заполненных ячеек
 
@@ -91,54 +79,54 @@ public:
                     printf("%s\n", "window is closing");
                     window.close();
                 }
+                handleMouseClick(event, pos, window, num_of_full_rect);
+                // if (event.type == Event::MouseButtonPressed) //сохраняет выбор (1-крестика/2-нолика) при нажатии в переменную Choice
+                // {
+                //     printf("%s\n", "button was pressed");
 
-                if (event.type == Event::MouseButtonPressed) //сохраняет выбор (1-крестика/2-нолика) при нажатии в переменную Choice
-                {
-                    printf("%s\n", "button was pressed");
+                //     if (event.mouseButton.button == Mouse::Left)
+                //     {
+                //         printf("%d %d\n", pos.x, pos.y);
+                //         if (game.Choice == 0) //если элемент не выбран, будем выбирать
+                //         {
+                //             printf("%s\n", "no choice made");
+                //             for (int i = 0; i < 2; i++)
+                //                 if (game.choice[i].getGlobalBounds().contains(pos.x, pos.y))
+                //                 {
+                //                     game.Choice = i + 1;
+                //                     printf("%s\n", "choice was made");
+                //                 }
+                //         }
+                //         else
+                //         {
+                //             printf("was a click after choice\n");
+                //             for (int i = 0; i < 9; i++)
+                //                 if (game.player.sprite[i].getGlobalBounds().contains(pos.x, pos.y) && !empty[i]) //если нажали на какую-то ячейку
+                //                 {
+                //                     printf("%s %d %s\n", "player clicked on the", i, "rectangle");
+                //                     game.player.tik[i] = true;
+                //                     empty[i] = true;
+                //                     num_of_full_rect += 1; //кол-во заполненных ячеек увеличивается на 1 после выполнения хода
 
-                    if (event.mouseButton.button == Mouse::Left)
-                    {
-                        printf("%d %d\n", pos.x, pos.y);
-                        if (game.Choice == 0) //если элемент не выбран, будем выбирать
-                        {
-                            printf("%s\n", "no choice made");
-                            for (int i = 0; i < 2; i++)
-                                if (game.choice[i].getGlobalBounds().contains(pos.x, pos.y))
-                                {
-                                    game.Choice = i + 1;
-                                    printf("%s\n", "choice was made");
-                                }
-                        }
-                        else
-                        {
-                            printf("was a click after choice\n");
-                            for (int i = 0; i < 9; i++)
-                                if (game.player.sprite[i].getGlobalBounds().contains(pos.x, pos.y) && !empty[i]) //если нажали на какую-то ячейку
-                                {
-                                    printf("%s %d %s\n", "player clicked on the", i, "rectangle");
-                                    game.player.tik[i] = true;
-                                    empty[i] = true;
-                                    num_of_full_rect += 1; //кол-во заполненных ячеек увеличивается на 1 после выполнения хода
-
-                                    if (num_of_full_rect < 9)
-                                    {
-                                        num_of_full_rect++;
-                                        int botstav = BotStav();
-                                        game.bot.tik[botstav] = true;
-                                        empty[botstav] = true;
-                                    }
-                                }
-                        }
-                    }
-                }
+                //                     if (num_of_full_rect < 9)
+                //                     {
+                //                         num_of_full_rect++;
+                //                         int botstav = BotStav();
+                //                         game.bot.tik[botstav] = true;
+                //                         empty[botstav] = true;
+                //                     }
+                //                 }
+                //         }
+                //     }
+                // }
             }
 
             for (int i = 0; i < 2; i++)
             {
-                if (game.choice[i].getGlobalBounds().contains(pos.x, pos.y))        //если курсор попал в крестик/нолик
-                    game.choice[i].setTextureRect(IntRect(200 * i, 200, 200, 200)); //обводим квадратом
+                if (choice[i].getGlobalBounds().contains(pos.x, pos.y))        //если курсор попал в крестик/нолик
+                    choice[i].setTextureRect(IntRect(200 * i, 200, 200, 200)); //обводим квадратом
                 else
-                    game.choice[i].setTextureRect(IntRect(200 * i, 0, 200, 200));
+                    choice[i].setTextureRect(IntRect(200 * i, 0, 200, 200));
             }
 
             bool winplay[8][2]; //события, при которых вощникает победа (то есть 3 по горизонтали/вертикали/диагонали всего таких комбинация 8), для игрока и бота (то есть 2)
@@ -146,18 +134,18 @@ public:
             {
                 if (i < 3)
                 {
-                    winplay[i][0] = game.player.tik[3 * i] && game.player.tik[1 + 3 * i] && game.player.tik[2 + 3 * i]; //являются ли три ячейки в горизонтальной линии i заняты символами игрока
-                    winplay[i][1] = game.bot.tik[3 * i] && game.bot.tik[1 + 3 * i] && game.bot.tik[2 + 3 * i];
+                    winplay[i][0] = player.tik[3 * i] && player.tik[1 + 3 * i] && player.tik[2 + 3 * i]; //являются ли три ячейки в горизонтальной линии i заняты символами игрока
+                    winplay[i][1] = bot.tik[3 * i] && bot.tik[1 + 3 * i] && bot.tik[2 + 3 * i];
                 }
                 else if (i >= 3 && i < 6)
                 {
-                    winplay[i][0] = game.player.tik[i - 3] && game.player.tik[i] && game.player.tik[i + 3]; //вертикальная линия
-                    winplay[i][1] = game.bot.tik[i - 3] && game.bot.tik[i] && game.bot.tik[i + 3];
+                    winplay[i][0] = player.tik[i - 3] && player.tik[i] && player.tik[i + 3]; //вертикальная линия
+                    winplay[i][1] = bot.tik[i - 3] && bot.tik[i] && bot.tik[i + 3];
                 }
                 else if (i >= 6)
                 {
-                    winplay[i][0] = game.player.tik[2 * (i - 6)] && game.player.tik[4] && game.player.tik[8 - 2 * (i - 6)]; //диагональная линия
-                    winplay[i][1] = game.bot.tik[2 * (i - 6)] && game.bot.tik[4] && game.bot.tik[8 - 2 * (i - 6)];
+                    winplay[i][0] = player.tik[2 * (i - 6)] && player.tik[4] && player.tik[8 - 2 * (i - 6)]; //диагональная линия
+                    winplay[i][1] = bot.tik[2 * (i - 6)] && bot.tik[4] && bot.tik[8 - 2 * (i - 6)];
                 }
 
                 for (int j = 0; j < 2; j++)
@@ -166,30 +154,30 @@ public:
                         win = true;
                         if (i < 3)
                         {
-                            game.line.setTextureRect(IntRect(0, 0, 600, 10)); //горизонталль
+                            line.setTextureRect(IntRect(0, 0, 600, 10)); //горизонталль
                             int ly = 95 + 200 * i;
                             printf("%d\n", ly);
-                            game.line.setPosition(0, ly);
+                            line.setPosition(0, ly);
                         }
                         else if (i < 6)
                         {
-                            game.line.setTextureRect(IntRect(0, 0, 600, 10)); //вертикаль
-                            game.line.setRotation(90);
+                            line.setTextureRect(IntRect(0, 0, 600, 10)); //вертикаль
+                            line.setRotation(90);
                             int lx = 105 + 200 * (i - 3);
                             printf("%d\n", lx);
-                            game.line.setPosition(lx, 0);
+                            line.setPosition(lx, 0);
                         }
                         else if (i == 6)
                         {
-                            game.line.setTextureRect(IntRect(0, 0, 600, 10)); //диагональ
-                            game.line.setRotation(45);
+                            line.setTextureRect(IntRect(0, 0, 600, 10)); //диагональ
+                            line.setRotation(45);
                             printf("45\n");
                         }
                         else if (i == 7)
                         {
-                            game.line.setTextureRect(IntRect(0, 0, 600, 10)); //диагональ
-                            game.line.setRotation(135);
-                            game.line.setPosition(600, 0);
+                            line.setTextureRect(IntRect(0, 0, 600, 10)); //диагональ
+                            line.setRotation(135);
+                            line.setPosition(600, 0);
                             printf("135\n");
                             sf::Vertex line[] =//
                             {                                           //
@@ -202,34 +190,34 @@ public:
                     }
             }
 
-            game.player.update(game.Choice);
+            player.update(Choice);
 
-            int ChoiceforBot = game.Choice + 1; //чтобы игрок и бот не смогли выбрать одинаковый спрайт (чтобы бот играл крестиком, а игрок -- ноликом или наоборот)
+            int ChoiceforBot = Choice + 1; //чтобы игрок и бот не смогли выбрать одинаковый спрайт (чтобы бот играл крестиком, а игрок -- ноликом или наоборот)
             if (ChoiceforBot == 3)
                 ChoiceforBot = 1;
 
-            game.bot.update(ChoiceforBot);
+            bot.update(ChoiceforBot);
 
             window.clear(Color::White);
 
-            if (game.Choice == 0) //если выбор спрайта не сделан
+            if (Choice == 0) //если выбор спрайта не сделан
                 for (int i = 0; i < 2; i++)
-                    window.draw(game.choice[i]); //на экран выводятся спрайты для выбора
+                    window.draw(choice[i]); //на экран выводятся спрайты для выбора
             else
             {
-                window.draw(game.fon); //на экран выводится сетка для игры
+                window.draw(fon); //на экран выводится сетка для игры
                 for (int i = 0; i < 9; i++)
                 {
-                    if (game.player.tik[i])
-                        window.draw(game.player.sprite[i]);
+                    if (player.tik[i])
+                        window.draw(player.sprite[i]);
 
-                    if (game.bot.tik[i])
-                        window.draw(game.bot.sprite[i]);
+                    if (bot.tik[i])
+                        window.draw(bot.sprite[i]);
                 }
             }
             if (win)
             {
-                window.draw(game.line);
+                window.draw(line);
                 printf("line");
             }
             window.display();
@@ -237,6 +225,65 @@ public:
     }
 
 };
+
+Game::Game() : Choice(0)
+{
+    net.loadFromFile("fon.png");
+    c.loadFromFile("crnol.png");
+    l.loadFromFile("line.png");
+    line.setTexture(l);
+    player.setTexture(c);
+    bot.setTexture(c);
+
+    fon.setTexture(net);
+    for (int i = 0; i < 2; i++)
+    {
+        choice[i].setTexture(c);                  //загрузка текстуры для получения спрайта
+        choice[i].setPosition(50 + 300 * i, 180); //позиция спрайта(крестика/нолика)
+    }
+}
+
+void Game::handleMouseClick(Event &event, Vector2i &pos, RenderWindow &window, int &num_of_full_rect)
+{
+    if (event.mouseButton.button == Mouse::Left)
+    {
+        printf("%d %d\n", pos.x, pos.y);
+        if (Choice == 0) //если элемент не выбран, будем выбирать
+        {
+            printf("%s\n", "no choice made");
+            for (int i = 0; i < 2; i++)
+                if (choice[i].getGlobalBounds().contains(pos.x, pos.y))
+                {
+                    Choice = i + 1;
+                    printf("%s\n", "choice was made");
+                }
+        }
+        else
+        {
+            printf("was a click after choice\n");
+            for (int i = 0; i < 9; i++)
+                if (player.sprite[i].getGlobalBounds().contains(pos.x, pos.y) && !empty[i]) //если нажали на какую-то ячейку
+                {
+                    printf("%s %d %s\n", "player clicked on the", i, "rectangle");
+                    player.tik[i] = true;
+                    empty[i] = true;
+                    num_of_full_rect += 1; //кол-во заполненных ячеек увеличивается на 1 после выполнения хода
+
+                    if (num_of_full_rect < 9)
+                    {
+                        num_of_full_rect++;
+                        int botstav = BotStav();
+                        bot.tik[botstav] = true;
+                        empty[botstav] = true;
+                    }
+                }
+        }
+    }
+}
+
+
+
+
 
 int BotStav() //функция, отвечающая за поиск свободной ячейки и возвращающая ее номер
 {
