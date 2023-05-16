@@ -80,45 +80,7 @@ public:
                     window.close();
                 }
                 handleMouseClick(event, pos, window, num_of_full_rect);
-                // if (event.type == Event::MouseButtonPressed) //сохраняет выбор (1-крестика/2-нолика) при нажатии в переменную Choice
-                // {
-                //     printf("%s\n", "button was pressed");
-
-                //     if (event.mouseButton.button == Mouse::Left)
-                //     {
-                //         printf("%d %d\n", pos.x, pos.y);
-                //         if (game.Choice == 0) //если элемент не выбран, будем выбирать
-                //         {
-                //             printf("%s\n", "no choice made");
-                //             for (int i = 0; i < 2; i++)
-                //                 if (game.choice[i].getGlobalBounds().contains(pos.x, pos.y))
-                //                 {
-                //                     game.Choice = i + 1;
-                //                     printf("%s\n", "choice was made");
-                //                 }
-                //         }
-                //         else
-                //         {
-                //             printf("was a click after choice\n");
-                //             for (int i = 0; i < 9; i++)
-                //                 if (game.player.sprite[i].getGlobalBounds().contains(pos.x, pos.y) && !empty[i]) //если нажали на какую-то ячейку
-                //                 {
-                //                     printf("%s %d %s\n", "player clicked on the", i, "rectangle");
-                //                     game.player.tik[i] = true;
-                //                     empty[i] = true;
-                //                     num_of_full_rect += 1; //кол-во заполненных ячеек увеличивается на 1 после выполнения хода
-
-                //                     if (num_of_full_rect < 9)
-                //                     {
-                //                         num_of_full_rect++;
-                //                         int botstav = BotStav();
-                //                         game.bot.tik[botstav] = true;
-                //                         empty[botstav] = true;
-                //                     }
-                //                 }
-                //         }
-                //     }
-                // }
+                
             }
 
             for (int i = 0; i < 2; i++)
@@ -245,38 +207,41 @@ Game::Game() : Choice(0)
 
 void Game::handleMouseClick(Event &event, Vector2i &pos, RenderWindow &window, int &num_of_full_rect)
 {
-    if (event.mouseButton.button == Mouse::Left)
+     if (event.type == Event::MouseButtonPressed) //сохраняет выбор (1-крестика/2-нолика) при нажатии в переменную Choice
     {
-        printf("%d %d\n", pos.x, pos.y);
-        if (Choice == 0) //если элемент не выбран, будем выбирать
+        if (event.mouseButton.button == Mouse::Left)
         {
-            printf("%s\n", "no choice made");
-            for (int i = 0; i < 2; i++)
-                if (choice[i].getGlobalBounds().contains(pos.x, pos.y))
-                {
-                    Choice = i + 1;
-                    printf("%s\n", "choice was made");
-                }
-        }
-        else
-        {
-            printf("was a click after choice\n");
-            for (int i = 0; i < 9; i++)
-                if (player.sprite[i].getGlobalBounds().contains(pos.x, pos.y) && !empty[i]) //если нажали на какую-то ячейку
-                {
-                    printf("%s %d %s\n", "player clicked on the", i, "rectangle");
-                    player.tik[i] = true;
-                    empty[i] = true;
-                    num_of_full_rect += 1; //кол-во заполненных ячеек увеличивается на 1 после выполнения хода
-
-                    if (num_of_full_rect < 9)
+            printf("%d %d\n", pos.x, pos.y);
+            if (Choice == 0) //если элемент не выбран, будем выбирать
+            {
+                printf("%s\n", "no choice made");
+                for (int i = 0; i < 2; i++)
+                    if (choice[i].getGlobalBounds().contains(pos.x, pos.y))
                     {
-                        num_of_full_rect++;
-                        int botstav = BotStav();
-                        bot.tik[botstav] = true;
-                        empty[botstav] = true;
+                        Choice = i + 1;
+                        printf("%s\n", "choice was made");
                     }
-                }
+            }
+            else
+            {
+                printf("was a click after choice\n");
+                for (int i = 0; i < 9; i++)
+                    if (player.sprite[i].getGlobalBounds().contains(pos.x, pos.y) && !empty[i]) //если нажали на какую-то ячейку
+                    {
+                        printf("%s %d %s\n", "player clicked on the", i, "rectangle");
+                        player.tik[i] = true;
+                        empty[i] = true;
+                        num_of_full_rect += 1; //кол-во заполненных ячеек увеличивается на 1 после выполнения хода
+
+                        if (num_of_full_rect < 9)
+                        {
+                            num_of_full_rect++;
+                            int botstav = BotStav();
+                            bot.tik[botstav] = true;
+                            empty[botstav] = true;
+                        }
+                    }
+            }
         }
     }
 }
