@@ -56,6 +56,7 @@ public:
 
     void handleMouseClick(Event &event, Vector2i &pos,RenderWindow &window, int &num_of_full_rect);
     void Victory(RenderWindow &window, bool &win);
+    void TextureAfterEvent(RenderWindow &window, bool &win);
 
     void Run()
     {
@@ -102,31 +103,9 @@ public:
             bot.update(ChoiceforBot);
 
             window.clear(Color::White);
-
-            if (Choice == 0) //если выбор спрайта не сделан
-                for (int i = 0; i < 2; i++)
-                    window.draw(choice[i]); //на экран выводятся спрайты для выбора
-            else
-            {
-                window.draw(fon); //на экран выводится сетка для игры
-                for (int i = 0; i < 9; i++)
-                {
-                    if (player.tik[i])
-                        window.draw(player.sprite[i]);
-
-                    if (bot.tik[i])
-                        window.draw(bot.sprite[i]);
-                }
-            }
-            if (win)
-            {
-                window.draw(line);
-                printf("line");
-            }
-            window.display();
+            TextureAfterEvent(window, win);
         }
     }
-
 };
 
 Game::Game() : Choice(0)
@@ -244,28 +223,37 @@ void Game::Victory(RenderWindow &window, bool &win)
                     line.setPosition(lx, 0);
                 }
                 else if (i == 6)
-                {
-                    line.setTextureRect(IntRect(0, 0, 600, 10)); //диагональ
-                    line.setRotation(45);
-                    printf("45\n");
-                }
-                else if (i == 7)
-                {
-                    line.setTextureRect(IntRect(0, 0, 600, 10)); //диагональ
-                    line.setRotation(135);
-                    line.setPosition(600, 0);
-                    printf("135\n");
-                    sf::Vertex line[] =//
-                    {                                           //
-                        sf::Vertex(sf::Vector2f(10, 10)),       //для реализации диагонали без текстуры как на сайте sfml
-                        sf::Vertex(sf::Vector2f(150, 150))      //
-                    };                                          //
-
-                window.draw(line, 2, sf::Lines);
-                }
+						line.setTextureRect(IntRect(0, 10, 600, 600));
+				else if (i == 7)
+						line.setTextureRect(IntRect(600, 10, -600, 600));               
             }
     }
 
+}
+
+void Game::TextureAfterEvent(RenderWindow &window, bool &win)
+{
+    if (Choice == 0) //если выбор спрайта не сделан
+        for (int i = 0; i < 2; i++)
+            window.draw(choice[i]); //на экран выводятся спрайты для выбора
+    else
+    {
+        window.draw(fon); //на экран выводится сетка для игры
+        for (int i = 0; i < 9; i++)
+        {
+            if (player.tik[i])
+                window.draw(player.sprite[i]);
+
+            if (bot.tik[i])
+                window.draw(bot.sprite[i]);
+        }
+    }
+    if (win)
+    {
+        window.draw(line);
+        printf("line");
+    }
+    window.display();
 }
 
 int main()
